@@ -65,8 +65,7 @@
   .paralelo-item:last-child { border-bottom:none; }
   .paralelo-ref { font-weight:500; color:var(--gold); font-size:.8rem; display:block; margin-bottom:3px; }
   .ornamento { text-align:center; color:var(--gold); font-size:1.2rem; margin:24px 0; opacity:.45; letter-spacing:.3em; }
-  .btn-novo { margin-top:28px; width:100%; padding:13px; background:transparent; border:1.5px solid var(--gold); border-radius:8px; color:var(--gold); font-family:'Jost',sans-serif; font-size:.85rem; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; transition:all .2s; }
-  .btn-novo:hover { background:var(--gold); color:var(--white); }
+  .volte-amanha { margin-top:28px; text-align:center; color:var(--gold); font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.05rem; }
   .erro { display:none; background:#fff5f5; border:1px solid #f4a0a0; border-radius:8px; padding:14px 20px; color:#8b2020; font-size:.88rem; margin-top:16px; }
   .erro.active { display:block; }
 </style>
@@ -80,7 +79,7 @@
   <div class="inicio" id="telaInicio">
     <span class="cruz">✝</span>
     <h2>Que a Palavra te alcance hoje</h2>
-    <p>Não é você que escolhe o trecho — é a direção do dia. Clique e receba o texto, o estudo e a reflexão preparados para agora.</p>
+    <p>Não é você que escolhe o trecho — é a direção do dia. Clique e receba o texto, o estudo e a reflexão preparados para hoje.</p>
     <button class="btn-receber" id="btnReceber" onclick="gerarEstudo()">✦ Receber a Palavra do Dia</button>
     <div class="erro" id="erroMsg"></div>
   </div>
@@ -118,7 +117,7 @@
       <div class="ornamento">✦ ✦ ✦</div>
       <div class="estudo-secao"><h4>Oração do Dia</h4><div class="caixa-destaque"><p id="oracao"></p></div></div>
     </div>
-    <button class="btn-novo" onclick="novoEstudo()">✦ Nova Palavra</button>
+    <p class="volte-amanha">✦ Uma nova Palavra chega amanhã ✦</p>
   </div>
 </main>
 <script>
@@ -131,7 +130,7 @@ async function gerarEstudo() {
   document.getElementById('loading').classList.add('active');
   btn.disabled = true;
   try {
-    const response = await fetch('/api/palavra', {method:'POST',headers:{'Content-Type':'application/json'}});
+    const response = await fetch('/api/palavra');
     const estudo = await response.json();
     if (!response.ok) throw new Error(estudo.error || 'Erro desconhecido');
     document.getElementById('refTexto').textContent = estudo.referencia;
@@ -149,7 +148,10 @@ async function gerarEstudo() {
     estudo.paralelos.forEach(p => {
       const div = document.createElement('div');
       div.className = 'paralelo-item';
-      div.innerHTML = `<span class="paralelo-ref">${p.referencia}</span>${p.texto}`;
+      const ref = document.createElement('span');
+      ref.className = 'paralelo-ref';
+      ref.textContent = p.referencia;
+      div.append(ref, p.texto);
       paralelosEl.appendChild(div);
     });
     document.getElementById('loading').classList.remove('active');
@@ -162,12 +164,6 @@ async function gerarEstudo() {
     document.getElementById('erroMsg').classList.add('active');
   }
   btn.disabled = false;
-}
-function novoEstudo() {
-  document.getElementById('resultado').classList.remove('active');
-  document.getElementById('telaInicio').style.display = 'block';
-  document.getElementById('telaInicio').style.opacity = '1';
-  window.scrollTo({top:0,behavior:'smooth'});
 }
 </script>
 </body>
